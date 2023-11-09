@@ -1,8 +1,8 @@
-# Bot_holodilnik
+# BotHolodilnik
 
 Бот который сообщает о появлении просроченных продуктов в холодильнике
 
-![Иллюстрация к проекту](https://github.com/Ovsienko2007/BotHolodilnik/blob/main/pictures/1.jpg)
+![Иллюстрация к проекту](https://github.com/Ovsienko2007/BotHolodilnik/blob/master/pictures/1.jpg)
 
 ## Содержание
 [Установка](#Ystanovka)
@@ -20,7 +20,7 @@
 
 2). Создать бота в [BotFather](https://t.me/botfatherи), получить токен
 
-![Иллюстрация к проекту](https://github.com/Ovsienko2007/BotHolodilnik/blob/main/pictures/2.png)
+![Иллюстрация к проекту](https://github.com/Ovsienko2007/BotHolodilnik/blob/master/pictures/2.png)
 
 3). Вставить токен в API_kluchi.txt
 

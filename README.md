@@ -24,26 +24,31 @@
 
 3). Вставить токен в API_kluchi.txt
 
-4). Запускаем командную строку Линукса. [Скачать здесь](https://gitforwindows.org/)
-
-Пишем команды:
-
+4). Создать файлы: 
 ```
-python -m venv ./venv
+Токены.txt
 ```
- 
 ```
-source ./venv/Scripts/activate
+chatid.txt
 ```
 
-```
-pip install -r requirements.txt
-```
+5). Написать в командной строке
 
-5). Запустить программу [chatid](https://github.com/Ovsienko2007/Bot_holodilnik/chatid.py) и отправить боту сообщение
+| Linux                                  | Windows                              |
+| -------------------------------------- | ------------------------------------ |
+| ```python -m venv ./venv```            | ```python -m venv my-venv```         |
+| ```source ./venv/Scripts/activate```   | ```venv\Scripts\activate```          |
+| ```pip install -r requirements.txt```  | ```pip install -r requirements.txt```|
+
+
+6). Запустить программу [1.py](https://github.com/Ovsienko2007/BotHolodilnik/blob/master/1.py) и отправить боту сообщение
 ```
 \start
 ```
+
+7). Запустить программу [BD.py](https://github.com/Ovsienko2007/BotHolodilnik/blob/master/BD.py)
+
+8). Запустить программу [main.py](https://github.com/Ovsienko2007/BotHolodilnik/blob/master/main.py)
 
 <a name="Tehn"><h2>Технологии</h2></a>
 

@@ -37,7 +37,7 @@ chatid.txt
 | Linux                                  | Windows                              |
 | -------------------------------------- | ------------------------------------ |
 | ```python -m venv ./venv```            | ```python -m venv my-venv```         |
-| ```source ./venv/Scripts/activate```   | ```venv\Scripts\activate```          |
+| ```source venv/bin/activate```         | ```venv\Scripts\activate```          |
 | ```pip install -r requirements.txt```  | ```pip install -r requirements.txt```|
 
 

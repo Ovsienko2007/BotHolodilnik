@@ -1,4 +1,4 @@
-
+import logging
 import schedule
 import datetime
 import re
@@ -23,6 +23,7 @@ for i in c.readlines():
     chatid.append(int(i))
 print(chatid)
 
+logging.basicConfig(level=logging.INFO)
 bot = Bot(token=TOKEN)
 dp = Dispatcher()
 
@@ -61,21 +62,25 @@ def location (message):
 """
 
 
-def pr():
-    print(3)
 
-pr()
+
 @dp.message(F.text == 'Привет')
 async def pr_prods(message: Message):
-    def pr():
-        print(3)
+    if message.chat.id in chatid:
+        def srok():
+            now = datetime.datetime.now()
+            BD.new_srok(now.strftime('%d.%m.%Y'))
 
-    print(3)
-    schedule.every(3).seconds.do(pr)
+        def sroc_nap():
+            now = datetime.datetime.now()
+            if BD.products_srock()!=[] and int(now.strftime('%H'))>=9:
+                message.answer("Появились просроченные продукты!")
 
-    while True:
-        schedule.run_pending()
-        await asyncio.sleep(1)
+        schedule.every().day.at("00.00").do(srok)
+        schedule.every(1).hour.do(sroc_nap)
+        while True:
+            schedule.run_pending()
+            await asyncio.sleep(1)
 
 
 
@@ -130,11 +135,14 @@ async def pr_prods(message: Message):
         knopki = InlineKeyboardMarkup(
             inline_keyboard=[[button]]
         )
-        ans = "Просроченные продукты\n"
+        a = 1
+        ans = '\n<b>__Есть просроченные продукты😞__</b>\n'
         for i in c:
-            ans += f'{i[1]}: {i[2]};\n'
+            ans += f'{a})  {i[1]}: {i[2]};\n'
+            a += 1
 
-        await message.answer(text=ans, reply_markup=knopki)
+
+        await message.answer(text=ans, reply_markup=knopki, parse_mode='HTML')
     else:
         await message.answer(text="Просроченных продуктов нет")
 
@@ -228,7 +236,11 @@ async def product(message: Message):
                 ans+=f'{c})  {i[1]}: {i[2]};\n'
                 c+=1
             if BD.products_srock()!=[]:
+                c=1
                 ans+='\n<b>__Есть просроченные продукты😞__</b>\n'
+                for i in BD.products_srock():
+                    ans += f'{c})  {i[1]}: {i[2]};\n'
+                    c += 1
             # отпрака сообщения
             await message.answer(text=ans, parse_mode='HTML')
         else:

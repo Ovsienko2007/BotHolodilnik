@@ -1,7 +1,5 @@
 import sqlite3
 
-import BD
-
 conn = sqlite3.connect('products.db')
 cur = conn.cursor()
 #cur.execute("ВАШ-SQL-ЗАПРОС-ЗДЕСЬ;")
@@ -23,6 +21,7 @@ cur.execute("""CREATE TABLE IF NOT EXISTS Product_srok(
     )
     );
 """)
+
 conn.commit()
 conn.close()
 
@@ -89,7 +88,7 @@ def new_srok(a):
     # Устанавливаем соединение с базой данных
     connection = sqlite3.connect('products.db')
     cursor = connection.cursor()
-    # Выбираем всех пользователей
+    # Выбираем продукт
     cursor.execute('SELECT * FROM Products WHERE product_srok = ?', (a,))
     pr = cursor.fetchall()
     for i in pr:
@@ -125,7 +124,7 @@ def delite_srok(a):
     connection = sqlite3.connect('products.db')
     cursor = connection.cursor()
     # Удаляем пользователя "newuser"
-    cursor.execute('DELETE * FROM Product_srok')
+    cursor.execute('DELETE FROM Product_srok WHERE product_id = ?', (a,))
     # Сохраняем изменения и закрываем соединение
     connection.commit()
     connection.close()

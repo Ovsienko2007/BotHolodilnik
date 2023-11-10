@@ -1,17 +1,24 @@
-import telebot
 
-x = open('Токены.txt', 'r+')
+from aiogram import Bot, Dispatcher
+from aiogram.filters import CommandStart
+
+x = open('Токены.txt', 'r')
 c=x.readlines()
 TOKEN = c[0][11:-1]
-bot=telebot.TeleBot(TOKEN)
+x.close()
 
-@bot.message_handler(commands=["start"])
+
+bot = Bot(token=TOKEN)
+dp = Dispatcher()
+
+@dp.message(CommandStart())
 def start (message):
+    c = open('chatid.txt', 'r')
     print(message.chat.id)
     print(type(message.chat.id))
-    x.write(f'chatid: {message.chat.id}')
-    x.close()
+    c.write(f'{message.chat.id}\n')
+    c.close()
 
 
-
-bot.infinity_polling()
+if __name__ == '__main__':
+    dp.run_polling(bot)

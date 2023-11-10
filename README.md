@@ -50,13 +50,15 @@ chatid.txt
 
 8). Запустить программу [main.py](https://github.com/Ovsienko2007/BotHolodilnik/blob/master/main.py)
 
+Если не хочешь хранить бота на своём компьютере жми [сюда](https://habr.com/ru/articles/709314/)
+
 <a name="Tehn"><h2>Технологии</h2></a>
 
 Python 3.10
 
-PyTelegramBotAPI (TeleBot)
+aiogram
 
-sqlalchemy (библиотека для работы с базами данных)
+sqlite3 (библиотека для работы с базами данных)
 
 schedule (библиотека для работы со временем)
 

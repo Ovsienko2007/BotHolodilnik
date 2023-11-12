@@ -1,6 +1,6 @@
 
-from aiogram import Bot, Dispatcher
-from aiogram.filters import CommandStart
+from aiogram import Bot, Dispatcher, types
+
 
 x = open('Токены.txt', 'r')
 c=x.readlines()
@@ -11,12 +11,23 @@ x.close()
 bot = Bot(token=TOKEN)
 dp = Dispatcher()
 
-@dp.message(CommandStart())
-def start (message):
-    c = open('chatid.txt', 'r')
-    print(message.chat.id)
-    print(type(message.chat.id))
-    c.write(f'{message.chat.id}\n')
+
+
+with open('userid.txt','a') as f: #создание файла если его нет
+    pass
+
+
+
+@dp.message()
+def start (message: types.Message):
+    id = []
+    with open('userid.txt', "r") as n:  # чтение всех id
+        id += n.readlines()
+
+    #добавление новых id
+    c = open('userid.txt', 'a+')
+    if f'{str(message.from_user.id)}\n' not in id: # добавление новых id
+        c.writelines(f'{str(message.from_user.id)}\n')
     c.close()
 
 

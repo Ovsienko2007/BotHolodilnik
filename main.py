@@ -4,80 +4,82 @@ import datetime
 import re
 import BD # подключение базы данных
 import asyncio
-from aiogram import Bot, Dispatcher, F
-from aiogram.filters import CommandStart
+from aiogram import Bot, Dispatcher, F, types
+
 from aiogram.types import (KeyboardButton, Message, ReplyKeyboardMarkup,
                            InlineKeyboardButton, InlineKeyboardMarkup,CallbackQuery)
 
-# токены
-x = open('Токены.txt', 'r')
+# получение токена бота
+x = open('Токен.txt', 'r')
 c=x.readlines()
 TOKEN = c[0][11:-1]
 x.close()
 
-c = open('chatid.txt', 'r')
-chatid=[]
-chatid1=5636710751
-
+# получение id пользователей
+c = open('userid.txt', 'r')
+userid=[]
 for i in c.readlines():
-    chatid.append(int(i))
-print(chatid)
+    userid.append(int(i))
+print(userid)
+userid1=userid[0] # основной чат
+c.close()
 
 logging.basicConfig(level=logging.INFO)
 bot = Bot(token=TOKEN)
 dp = Dispatcher()
 
-@dp.message(CommandStart())
+
+
+def start_filter(message: Message) -> bool:
+    return message.text == '/start' or message.text == '/help'
+@dp.message(start_filter)
 async def start (message):
-    if message.chat.id in chatid:
+    if message.from_user.id in userid:
         #Клавиатура с кнопкой запроса локации
-        button_1= KeyboardButton(text="Отправить местоположение", request_location = True)
-        button_2 = KeyboardButton(text='Продукты')
-        button_3 = KeyboardButton(text='Удаление продуктов')
-        button_4 = KeyboardButton(text='Просроченные продукты')
-        keyboard = ReplyKeyboardMarkup(keyboard=[[button_1],[button_3, button_2],[button_4]])
-        await message.answer(text='Чего кошки боятся больше?', reply_markup=keyboard)
-
-"""
-#Получаю локацию
-@bot.message_handler(content_types=['location'])
-def location (message):
-    print(message)
-
-    def today():
-        day = datetime.date.today().day
-        month = datetime.date.today().month
-        year = datetime.date.today().year
-        if day < 10:
-            day = '0' + str(day)
-        if month < 10:
-            month = '0' + str(month)
-
-        date = str(day) + '.' + str(month) + '.' + str(year)
-        BD.new_srok(date)
-        print(date)
-
-    schedule.every().day.at("00:00").do(today)
-    
-"""
+        button_1 = KeyboardButton(text='Продукты')
+        button_2 = KeyboardButton(text='Удаление продуктов')
+        button_3 = KeyboardButton(text='Просроченные продукты')
+        button_4 = KeyboardButton(text='Дом')
+        keyboard = ReplyKeyboardMarkup(keyboard=[[button_1],[button_2,button_3],[button_4]])
+        BD.new_geo(message.from_user.id)
+        await message.answer(text=f'Привет, <b>{message.from_user.first_name}</b>!\n\n'
+                                  f'Сейчас я вкратце расскажу о себе\n'
+                                  f'Я создан, чтобы напоминать людям о появлении просроченных продуктов.n'
+                                  f'Ты вводишь в меня пр',
+                             reply_markup=keyboard,
+                             parse_mode='HTML')
 
 
+@dp.message(F.location)
+@dp.edited_message(F.location)
+async def geo(message: Message):
+    if message.from_user.id in userid:
+        lat = message.location.latitude
+        long = message.location.longitude
+        BD.geo_update(message.from_user.id, long, lat)
 
 
 @dp.message(F.text == 'Привет')
 async def pr_prods(message: Message):
-    if message.chat.id in chatid:
+    if message.from_user.id in userid:
         def srok():
             now = datetime.datetime.now()
             BD.new_srok(now.strftime('%d.%m.%Y'))
 
+
+        def ge():
+            pass
+
         def sroc_nap():
             now = datetime.datetime.now()
-            if BD.products_srock()!=[] and int(now.strftime('%H'))>=9:
+            print(now.strftime('%H:%M'))
+            if BD.products_srock()!=[] and int(now.strftime('%H:%M'))>=9:
                 message.answer("Появились просроченные продукты!")
 
-        schedule.every().day.at("00.00").do(srok)
+        schedule.every().day.at("00:00").do(srok)
         schedule.every(1).hour.do(sroc_nap)
+        schedule.every(10).seconds.do(ge)
+
         while True:
             schedule.run_pending()
             await asyncio.sleep(1)
@@ -127,24 +129,25 @@ async def Dell_srok(callback: CallbackQuery):
 
 @dp.message(F.text == 'Просроченные продукты')
 async def pr_prods(message: Message):
-    c = BD.products_srock()
-    if c != []:
-        button = InlineKeyboardButton(
-            text='Удалить всё',
-            callback_data='ALL')
-        knopki = InlineKeyboardMarkup(
-            inline_keyboard=[[button]]
-        )
-        a = 1
-        ans = '\n<b>__Есть просроченные продукты😞__</b>\n'
-        for i in c:
-            ans += f'{a})  {i[1]}: {i[2]};\n'
-            a += 1
+    if message.from_user.id in userid:
+        c = BD.products_srock()
+        if c != []:
+            button = InlineKeyboardButton(
+                text='Удалить всё',
+                callback_data='ALL')
+            knopki = InlineKeyboardMarkup(
+                inline_keyboard=[[button]]
+            )
+            a = 1
+            ans = '\n<b>__Есть просроченные продукты😞__</b>\n'
+            for i in c:
+                ans += f'{a})  {i[1]}: {i[2]};\n'
+                a += 1
 
 
-        await message.answer(text=ans, reply_markup=knopki, parse_mode='HTML')
-    else:
-        await message.answer(text="Просроченных продуктов нет")
+            await message.answer(text=ans, reply_markup=knopki, parse_mode='HTML')
+        else:
+            await message.answer(text="Просроченных продуктов нет")
 
 
 
@@ -210,7 +213,7 @@ async def process_buttons_press(callback: CallbackQuery):
 # удаление продуктов
 @dp.message(F.text == 'Удаление продуктов')
 async def process_start_command(message: Message):
-    if message.chat.id in chatid:
+    if message.from_user.id in userid:
         # сборка клавиатуры из кнопок
         if pr()!=[]:
             in_keyboard = InlineKeyboardMarkup(
@@ -227,7 +230,7 @@ async def process_start_command(message: Message):
 
 @dp.message(F.text == 'Продукты')
 async def product(message: Message):
-    if message.chat.id in chatid:
+    if message.from_user.id in userid:
         if BD.products()!=[]:
             # создание текста для сообщения
             ans='<b>____________Продукты🍞_____________</b>\n'
@@ -247,9 +250,9 @@ async def product(message: Message):
             await message.answer("Продуктов нет")
 
 
-@dp.message()
+@dp.message(F.text)
 async def product_new (message: Message):
-    if message.chat.id in chatid:
+    if message.from_user.id in userid:
         try:
             # Обработка сообщения
             t=message.text

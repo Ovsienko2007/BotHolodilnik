@@ -39,15 +39,13 @@
 
 
 6). Запустить программу [1.py](https://github.com/Ovsienko2007/BotHolodilnik/blob/master/1.py) и отправить боту любое сообщение
-```
-\start
-```
 
 7). Запустить программу [BD.py](https://github.com/Ovsienko2007/BotHolodilnik/blob/master/BD.py)
 
 8). Запустить программу [main.py](https://github.com/Ovsienko2007/BotHolodilnik/blob/master/main.py)
 
-Если не хочешь хранить бота на своём компьютере жми [сюда](https://habr.com/ru/articles/709314/)
+Если не хочешь хранить бота на своём компьютере жми [сюда](https://habr.com/ru/articles/709314/) тут подробно рассказано, как установить бота на сервер и запустить его.
+При установке библиотек на сервер писать лишь одну команду: ```pip install -r requirements.txt```
 
 <a name="Tehn"><h2>Технологии</h2></a>
 
@@ -58,6 +56,8 @@ aiogram
 sqlite3 (библиотека для работы с базами данных)
 
 schedule (библиотека для работы со временем)
+
+datetime (библиотека для определения текущей даты и времени)
 
 <a name="avt"><h2>Автор</h2></a>
 Овсиекно Глеб

@@ -38,7 +38,7 @@ def start (message):
 
         bot.send_message(message.chat.id, "Поделись местоположением", reply_markup=keyboard)
 
-"""
+
 #Получаю локацию
 @bot.message_handler(content_types=['location'])
 def location (message):
@@ -174,6 +174,6 @@ def product_new (message):
 
 
 
-"""
+
 if __name__ == '__main__':
     dp.run_polling(bot)

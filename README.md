@@ -26,10 +26,7 @@
 
 4). Создать файлы: 
 ```
-Токены.txt
-```
-```
-chatid.txt
+Токен.txt
 ```
 
 5). Написать в командной строке
@@ -41,7 +38,7 @@ chatid.txt
 | ```pip install -r requirements.txt```  | ```pip install -r requirements.txt```|
 
 
-6). Запустить программу [1.py](https://github.com/Ovsienko2007/BotHolodilnik/blob/master/1.py) и отправить боту сообщение
+6). Запустить программу [1.py](https://github.com/Ovsienko2007/BotHolodilnik/blob/master/1.py) и отправить боту любое сообщение
 ```
 \start
 ```

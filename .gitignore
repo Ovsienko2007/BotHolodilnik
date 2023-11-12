@@ -1,8 +1,7 @@
 venv/
 __pycache__/
 .idea/
-chatid.txt
-Токены.txt
-products.db
+Токен.txt
+BD.db
 тест.py
 

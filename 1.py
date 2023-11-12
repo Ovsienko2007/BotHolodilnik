@@ -2,7 +2,7 @@
 from aiogram import Bot, Dispatcher, types
 
 
-x = open('Токены.txt', 'r')
+x = open('Токен.txt', 'r')
 c=x.readlines()
 TOKEN = c[0][11:-1]
 x.close()

@@ -30,7 +30,7 @@ dp = Dispatcher()
 
 
 
-def start_filter(message: Message) -> bool:
+def start_filter(message: Message):
     return message.text == '/start' or message.text == '/help'
 @dp.message(start_filter)
 async def start (message):
@@ -54,10 +54,26 @@ async def start (message):
 @dp.edited_message(F.location)
 async def geo(message: Message):
     if message.from_user.id in userid:
-        lat = message.location.latitude
-        long = message.location.longitude
-        BD.geo_update(message.from_user.id, long, lat)
+        lat = "%.4f"%float(message.location.latitude)
+        long = "%.4f"%float(message.location.longitude)
+        BD.geo_update(message.from_user.id, str(long), str(lat))
 
+def Home(message: Message):
+    return message.text == '/home'
+@dp.message(Home)
+async def home_com(message: Message):
+    if message.from_user.id == userid1:
+        with open('home.txt', 'a') as f:  # создание файла если его нет
+            pass
+        with open('home.txt', 'r+') as f:  # внос данных
+            c=await BD.geo(message.from_user.id)
+            f.writelines("\n".join(c))
+
+@dp.message(F.text=="Дом")
+async def home(message: Message):
+    if message.from_user.id in userid:
+        ge=BD.geo(message.from_user.id)
+        await bot.send_location(chat_id=message.chat.id, latitude=ge[0], longitude=ge[1])
 
 @dp.message(F.text == 'Привет')
 async def pr_prods(message: Message):

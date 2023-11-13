@@ -12,7 +12,7 @@ from aiogram.types import (KeyboardButton, Message, ReplyKeyboardMarkup,
 # получение токена бота
 x = open('Токен.txt', 'r')
 c=x.readlines()
-TOKEN = c[0][11:-1]
+TOKEN = c[0][11:]
 x.close()
 
 # получение id пользователей
@@ -41,7 +41,6 @@ async def start (message):
         button_3 = KeyboardButton(text='Просроченные продукты')
         button_4 = KeyboardButton(text='Дом')
         keyboard = ReplyKeyboardMarkup(keyboard=[[button_1],[button_2,button_3],[button_4]])
-        BD.new_geo(message.from_user.id)
         await message.answer(text=f'Привет, <b>{message.from_user.first_name}</b>!\n\n'
                                   f'Сейчас я вкратце расскажу о себе\n'
                                   f'Я создан, чтобы напоминать людям о появлении просроченных продуктов.n'
@@ -183,10 +182,8 @@ def pr():
 # удаление продукта 2 этап
 @dp.callback_query(F.data.in_(['DEL','NO']))
 async def DaNet2(callback: CallbackQuery):
-    print(callback.data)
     if callback.data=='DEL':
-        print(id)
-        print(BD.prod(id))
+        id=BD.del_prod_id(callback.from_user.id)
         BD.delite(id)
     else:
         pass
@@ -205,8 +202,7 @@ async def DaNet2(callback: CallbackQuery):
 # удаление продукта 1 этап
 @dp.callback_query()
 async def process_buttons_press(callback: CallbackQuery):
-    global id
-    id =callback.data
+    BD.del_prod_id_update(callback.from_user.id,callback.data)
 
     button_1 = InlineKeyboardButton(
         text='Удалить',

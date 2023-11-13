@@ -18,10 +18,11 @@ cur.execute("""CREATE TABLE IF NOT EXISTS Product_srok(
     PRIMARY KEY (product_id)
     );
 """)
-cur.execute("""CREATE TABLE IF NOT EXISTS Geo (
+cur.execute("""CREATE TABLE IF NOT EXISTS Users (
     user_id INTEGER UNIQUE,
     lat     TEXT DEFAULT No,
-    long    TEXT DEFAULT No
+    long    TEXT DEFAULT No,
+    prod_id_del INTEGER DEFAULT 0
 );
 """)
 
@@ -122,13 +123,13 @@ def delite_srok(a):
     connection.commit()
     connection.close()
 
-def new_geo(a):
+def new_user(a):
     try:
         # Устанавливаем соединение с базой данных
         connection = sqlite3.connect('BD.db')
         cursor = connection.cursor()
         # Добавляем нового пользователя
-        cursor.execute('INSERT INTO Geo (user_id) VALUES (?)', (a,))
+        cursor.execute('INSERT INTO Users (user_id) VALUES (?)', (a,))
         # Сохраняем изменения и закрываем соединение
         connection.commit()
         connection.close()
@@ -140,7 +141,7 @@ def geo_update(a, long, lat):
     connection = sqlite3.connect('BD.db')
     cursor = connection.cursor()
     # Добавляем новый продукт
-    cursor.execute('UPDATE Geo SET long= ?, lat= ? WHERE user_id = ?', (long, lat, a))
+    cursor.execute('UPDATE Users SET long= ?, lat= ? WHERE user_id = ?', (long, lat, a))
     # Сохраняем изменения и закрываем соединение
     connection.commit()
     connection.close()
@@ -150,14 +151,39 @@ def geo(a):
     connection = sqlite3.connect('BD.db')
     cursor = connection.cursor()
     # Выбираем продукт
-    cursor.execute('SELECT * FROM Geo WHERE user_id = ?', (a,))
+    cursor.execute('SELECT * FROM Users WHERE user_id = ?', (a,))
     ge = cursor.fetchall()
     # Закрываем соединение
     connection.close()
     return ge[0][1], ge[0][2]
 
+def del_prod_id_update(a, prod_id):
+    # Устанавливаем соединение с базой данных
+    connection = sqlite3.connect('BD.db')
+    cursor = connection.cursor()
+    # Добавляем новый продукт
+    cursor.execute('UPDATE Users SET prod_id_del = ? WHERE user_id = ?', (prod_id, a))
+    # Сохраняем изменения и закрываем соединение
+    connection.commit()
+    connection.close()
+
+# Получение id удоляемого продукта
+def del_prod_id(a):
+    # Устанавливаем соединение с базой данных
+    connection = sqlite3.connect('BD.db')
+    cursor = connection.cursor()
+    # Выбираем продукт
+    cursor.execute('SELECT prod_id_del FROM Users WHERE user_id = ?', (a,))
+    pr = cursor.fetchall()
+    # Закрываем соединение
+    connection.close()
+    return pr[0][0]
+
 if __name__ == "__main__":
-    print(geo(1))
-    print(geo(2))
+    new_user(1)
+    print(del_prod_id(1))
+    del_prod_id_update(1, 123)
+    print(del_prod_id(1))
+
     for i in products():
         print(f'{i[0]}  {i[1]}: {i[2]};')

@@ -1,10 +1,13 @@
 
 from aiogram import Bot, Dispatcher, types
-
+from BD import new_user
 
 x = open('Токен.txt', 'r')
 c=x.readlines()
-TOKEN = c[0][11:-1]
+TOKEN = c[0][11:]
+print(TOKEN)
+print('__________________')
+
 x.close()
 
 
@@ -29,6 +32,7 @@ def start (message: types.Message):
     if f'{str(message.from_user.id)}\n' not in id: # добавление новых id
         c.writelines(f'{str(message.from_user.id)}\n')
     c.close()
+    new_user(message.from_user.id)
 
 
 if __name__ == '__main__':

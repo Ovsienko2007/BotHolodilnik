@@ -38,9 +38,9 @@
 | ```pip install -r requirements.txt```  | ```pip install -r requirements.txt```|
 
 
-6). Запустить программу [1.py](https://github.com/Ovsienko2007/BotHolodilnik/blob/master/1.py) и отправить боту любое сообщение
+6). Запустить программу [BD.py](https://github.com/Ovsienko2007/BotHolodilnik/blob/master/BD.py)
 
-7). Запустить программу [BD.py](https://github.com/Ovsienko2007/BotHolodilnik/blob/master/BD.py)
+7). Запустить программу [start.py](https://github.com/Ovsienko2007/BotHolodilnik/blob/master/1.py) и отправить боту любое сообщение
 
 8). Запустить программу [main.py](https://github.com/Ovsienko2007/BotHolodilnik/blob/master/main.py)
 

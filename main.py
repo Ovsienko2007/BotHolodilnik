@@ -57,47 +57,99 @@ async def geo(message: Message):
         long = "%.4f"%float(message.location.longitude)
         BD.geo_update(message.from_user.id, str(long), str(lat))
 
+
+# создание команды /home
 def Home(message: Message):
     return message.text == '/home'
+
+# создание файла с координатами "дома"
 @dp.message(Home)
 async def home_com(message: Message):
     if message.from_user.id == userid1:
         with open('home.txt', 'a') as f:  # создание файла если его нет
             pass
         with open('home.txt', 'r+') as f:  # внос данных
-            c=await BD.geo(message.from_user.id)
+            c=BD.geo(message.from_user.id)
             f.writelines("\n".join(c))
 
+# получение координат "дома" из файла
+def home():
+    with open('home.txt', 'r') as f:
+        ge = f.readlines()
+        ge[0]=ge[0][:-1]
+    return list(map(float, ge))
+
+# отправка геопозиции "дома" из файла
 @dp.message(F.text=="Дом")
-async def home(message: Message):
+async def home1(message: Message):
     if message.from_user.id in userid:
-        ge=BD.geo(message.from_user.id)
+        ge = home()
         await bot.send_location(chat_id=message.chat.id, latitude=ge[0], longitude=ge[1])
 
-@dp.message(F.text == 'Привет')
+
+"""@dp.message(F.text == 'Привет')
 async def pr_prods(message: Message):
     if message.from_user.id in userid:
+        await bot.send_message(chat_id=message.chat.id, text=' sdf')
         def srok():
             now = datetime.datetime.now()
             BD.new_srok(now.strftime('%d.%m.%Y'))
+        def geo():
+            message.answer("Появились просроченные продукты!")
 
-
-        def ge():
-            pass
-
-        def sroc_nap():
+        async def sroc_nap():
+            await bot.send_message(chat_id=message.chat.id, text=' sdf')
             now = datetime.datetime.now()
             print(now.strftime('%H:%M'))
-            if BD.products_srock()!=[] and int(now.strftime('%H:%M'))>=9:
-                message.answer("Появились просроченные продукты!")
+            if BD.products_srock()==[] and int(now.strftime('%H'))>=9:
+                await message.answer("Появились просроченные продукты!")
 
         schedule.every().day.at("00:00").do(srok)
-        schedule.every(1).hour.do(sroc_nap)
-        schedule.every(10).seconds.do(ge)
+        schedule.every(10).seconds.do(sroc_nap)
+        schedule.every(3).seconds.do(geo)
 
         while True:
             schedule.run_pending()
-            await asyncio.sleep(1)
+            await asyncio.sleep(1)"""
+
+def geo123():
+    us=list(map(float, BD.geo(userid1)))
+    ho=home()
+    print(us)
+    print(ho)
+    if BD.geo(userid1)==('No', 'No'):
+        return True
+    elif ho[0]-0.0002<us[0]<ho[0]+0.0002 and ho[1]-0.0002<us[1]<ho[1]+0.0002:
+        return True
+    else:
+        return False
+
+def Time(message: Message):
+    return message.text == '/time'
+@dp.message(Time)
+async def ti(message: Message):
+    print(geo123())
+    flag = True
+
+    while True:
+        now = datetime.datetime.now()
+
+        if now.strftime('%H:%M')=="00:00" and flag:
+            print(1)
+            BD.new_srok(now.strftime('%d.%m.%Y'))
+            flag=False
+
+        elif now.strftime('%H:%M')!="00:00":
+            flag = True
+
+        async def sroc_nap():
+            print(3)
+            now = datetime.datetime.now()
+            print(now.strftime('%H:%M'))
+            if BD.products_srock()==[] and int(now.strftime('%H'))>=9:
+                print(4)
+        await asyncio.sleep(1)
+
 
 
 
@@ -163,9 +215,6 @@ async def pr_prods(message: Message):
             await message.answer(text=ans, reply_markup=knopki, parse_mode='HTML')
         else:
             await message.answer(text="Просроченных продуктов нет")
-
-
-
 
 # Все продукты
 def pr():
@@ -276,8 +325,6 @@ async def product_new (message: Message):
             BD.new(prod,srok)
         except:
             await message.answer("Не удалось ввсести продукт")
-
-
 
 
 if __name__ == '__main__':

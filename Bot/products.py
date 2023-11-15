@@ -1,7 +1,8 @@
 from main import *
 
+print(3)
 # удаление просроченных продуктов
-@dp.message(F.text == 'Просроченные продукты')
+@dp.message(F.text.regexp(r'Просроченные продукты.+'))
 async def pr_prods(message: Message):
     if message.from_user.id in userid:
         c = BD.products_srock()
@@ -34,9 +35,10 @@ def pr():
 
     return products
 
-@dp.message(F.text == 'Продукты')
+@dp.message(F.text.regexp(r'Продукты.+'))
 async def product(message: Message):
     if message.from_user.id in userid:
+        print(3)
         if BD.products()!=[]:
             # создание текста для сообщения
             ans='<b>____________Продукты🍞_____________</b>\n'
@@ -56,7 +58,7 @@ async def product(message: Message):
             await message.answer("Продуктов нет ❌")
 
 # удаление продуктов
-@dp.message(F.text == 'Удаление продуктов')
+@dp.message(F.text.regexp(r'Удаление продуктов.+'))
 async def process_start_command(message: Message):
     if message.from_user.id in userid:
         # сборка клавиатуры из кнопок

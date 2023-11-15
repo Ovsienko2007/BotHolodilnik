@@ -77,7 +77,7 @@ async def process_buttons_press(callback: CallbackQuery):
     )
 
     await callback.message.edit_text(
-        text=f'Вы действительно хотите удалить <b>{BD.prod(callback.text)}</b>',
+        text=f'Вы действительно хотите удалить <b>{BD.prod(callback.data)[0][1]}</b>',
         reply_markup=danet,
         parse_mode='HTML'
     )

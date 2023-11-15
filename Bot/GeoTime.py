@@ -31,7 +31,7 @@ async def home_com(message: Message):
             f.writelines("\n".join(c))
 
 # отправка геопозиции "дома" из файла
-@dp.message(F.text=="Дом")
+@dp.message(F.text.regexp(r'Дом.+'))
 async def home1(message: Message):
     if message.from_user.id in userid:
         ge = home()

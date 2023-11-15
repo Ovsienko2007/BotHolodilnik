@@ -10,6 +10,8 @@ async def set_main_menu(bot: Bot):
                    description='Информация о боте'),
         BotCommand(command='/home',
                    description='Устанавливает точку дома'),
+        BotCommand(command='/time',
+                   description='Напоминает о появлении просроченных продуктов')
     ]
 
     await bot.set_my_commands(main_menu_commands)

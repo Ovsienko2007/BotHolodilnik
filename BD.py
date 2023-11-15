@@ -77,7 +77,7 @@ def prod(a):
     connection.close()
     return pr
 
-# Вывод просроченных продуктов
+# Добавление просроченных продуктов
 def new_srok(a):
     # Устанавливаем соединение с базой данных
     connection = sqlite3.connect('BD.db')
@@ -101,18 +101,19 @@ def new_srok(a):
     connection.commit()
     connection.close()
 
+# Вывод всех просроченных продуктов
 def products_srock():
     # Устанавливаем соединение с базой данных
     connection = sqlite3.connect('BD.db')
     cursor = connection.cursor()
-    # Выбираем всех пользователей
+    # Выбираем все продукты
     cursor.execute('SELECT * FROM Product_srok')
     pr = cursor.fetchall()
     # Закрываем соединение
     connection.close()
     return pr
 
-
+ # Удаляем просроченного продукта
 def delite_srok(a):
     # Устанавливаем соединение с базой данных
     connection = sqlite3.connect('BD.db')
@@ -123,6 +124,7 @@ def delite_srok(a):
     connection.commit()
     connection.close()
 
+# Добавляем нового пользователя
 def new_user(a):
     try:
         # Устанавливаем соединение с базой данных
@@ -136,43 +138,46 @@ def new_user(a):
     except:
         pass
 
+# Обновление геопозиции пользователя
 def geo_update(a, long, lat):
     # Устанавливаем соединение с базой данных
     connection = sqlite3.connect('BD.db')
     cursor = connection.cursor()
-    # Добавляем новый продукт
+    # Обнавляем геопозицию
     cursor.execute('UPDATE Users SET long= ?, lat= ? WHERE user_id = ?', (long, lat, a))
     # Сохраняем изменения и закрываем соединение
     connection.commit()
     connection.close()
 
+# Вывод геопозиции пользователя
 def geo(a):
     # Устанавливаем соединение с базой данных
     connection = sqlite3.connect('BD.db')
     cursor = connection.cursor()
-    # Выбираем продукт
+    # Выбираем геопозицию пользователя
     cursor.execute('SELECT * FROM Users WHERE user_id = ?', (a,))
     ge = cursor.fetchall()
     # Закрываем соединение
     connection.close()
     return ge[0][1], ge[0][2]
 
+#  Добавление id удаляемого продукта
 def del_prod_id_update(a, prod_id):
     # Устанавливаем соединение с базой данных
     connection = sqlite3.connect('BD.db')
     cursor = connection.cursor()
-    # Добавляем новый продукт
+    # Добавляем id удаляемого продукта
     cursor.execute('UPDATE Users SET prod_id_del = ? WHERE user_id = ?', (prod_id, a))
     # Сохраняем изменения и закрываем соединение
     connection.commit()
     connection.close()
 
-# Получение id удоляемого продукта
+# Вывод id удаляемого продукта
 def del_prod_id(a):
     # Устанавливаем соединение с базой данных
     connection = sqlite3.connect('BD.db')
     cursor = connection.cursor()
-    # Выбираем продукт
+    # Получаем id удаляемого продукта
     cursor.execute('SELECT prod_id_del FROM Users WHERE user_id = ?', (a,))
     pr = cursor.fetchall()
     # Закрываем соединение
@@ -180,10 +185,5 @@ def del_prod_id(a):
     return pr[0][0]
 
 if __name__ == "__main__":
-    new_user(1)
-    print(del_prod_id(1))
-    del_prod_id_update(1, 123)
-    print(del_prod_id(1))
-
     for i in products():
         print(f'{i[0]}  {i[1]}: {i[2]};')

@@ -78,7 +78,7 @@ async def ti(message: Message):
     # запуск цикла времени
     while True:
         now = datetime.datetime.now() # получение текущего времени
-        if int(c)==0 and flag1:
+        if int(now.strftime('%H'))==0 and flag1:
             # Перенос просроченных продуктов из одной таблицы в другую
             BD.new_srok(now.strftime('%d.%m.%Y'))
             flag1=False

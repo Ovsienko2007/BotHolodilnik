@@ -1,47 +1,65 @@
 from main import *
 
-
-@dp.message(F.location)
-@dp.edited_message(F.location)
+# получение геопозиции
+@dp.message(and_f(F.location, filter))
 async def geo(message: Message):
-    if message.from_user.id in userid:
-        lat = "%.4f"%float(message.location.latitude)
-        long = "%.4f"%float(message.location.longitude)
-        BD.geo_update(message.from_user.id, str(long), str(lat))
+    lat = "%.4f"%float(message.location.latitude)
+    long = "%.4f"%float(message.location.longitude)
+    BD.geo_update(message.from_user.id, str(long), str(lat))
+    await message.answer("Геопозиция принята ✔")
+
+# обновление геопозиции
+@dp.edited_message(and_f(F.location, filter))
+async def geo(message: Message):
+    lat = "%.4f"%float(message.location.latitude)
+    long = "%.4f"%float(message.location.longitude)
+    BD.geo_update(message.from_user.id, str(long), str(lat))
 
 # получение координат "дома" из файла
 def home():
-    with open('home.txt', 'r') as f:
-        ge = f.readlines()
-        ge[0]=ge[0][:-1]
-    return list(map(float, ge))
+    try:
+        with open('home.txt', 'r') as f:
+            ge = f.readlines()
+            ge[0]=ge[0][:-1]
+        return list(map(float, ge))
+    except:
+        return []
 
 # создание команды /home
 def Home(message: Message):
     return message.text == '/home'
 
 # создание файла с координатами "дома"
-@dp.message(Home)
+@dp.message(and_f(Home, filter))
 async def home_com(message: Message):
-    if message.from_user.id == userid1:
+    c=BD.geo(message.from_user.id)
+    if c!=('No', 'No'):
         with open('home.txt', 'a') as f:  # создание файла если его нет
             pass
         with open('home.txt', 'r+') as f:  # внос данных
-            c=BD.geo(message.from_user.id)
             f.writelines("\n".join(c))
+        await message.answer('Геопозиция "Дома" установлена ✔')
+    else:
+        await message.answer('Геопозиция "Дома" не установлена ❌\n\n'
+                             '<i>Чтобы установить точку дома надо, прежде скинуть боту геопозицию</i>',
+                             parse_mode='HTML')
 
 # отправка геопозиции "дома" из файла
-@dp.message(F.text.regexp(r'Дом.+'))
+@dp.message(and_f(F.text.regexp(r'Дом.+'), filter))
 async def home1(message: Message):
-    if message.from_user.id in userid:
-        ge = home()
+    ge = home()
+    if ge!=[]:
         await bot.send_location(chat_id=message.chat.id, latitude=ge[0], longitude=ge[1])
+    else:
+        await message.answer('Точка дома не была установлена 😞\n\n'
+                             '<i>Чтобы использовать эту функцию установите точку "Дома"</i>',
+                             parse_mode='HTML')
 
 # проверка находится ли пользователь "Дома"
 def geo123(user):
     us=list(map(float, BD.geo(user)))
     ho=home()
-    if BD.geo(userid1)==('No', 'No'): # Если данные о геопозиции не были переданы
+    if BD.geo(user)==('No', 'No'): # Если данные о геопозиции не были переданы
         return True
     elif ho[0]-0.0002<us[0]<ho[0]+0.0002 and ho[1]-0.0002<us[1]<ho[1]+0.0002: # Если пользователь находится дома
         return True
@@ -52,7 +70,7 @@ def geo123(user):
 # создание команды /time
 def Time(message: Message):
     return message.text == '/time'
-@dp.message(Time)
+@dp.message(and_f(Time , filter))
 async def ti(message: Message):
     # создание переменных флагов
     flag1 = True

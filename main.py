@@ -2,7 +2,7 @@ import datetime
 import re
 import asyncio
 from aiogram import Bot, Dispatcher, F, types
-
+from aiogram.filters import and_f
 from aiogram.types import (KeyboardButton, Message, ReplyKeyboardMarkup,
                            InlineKeyboardButton, InlineKeyboardMarkup, CallbackQuery, BotCommand)
 import logging
@@ -24,6 +24,10 @@ userid1 = userid[0]  # основной чат
 c.close()
 bot = Bot(token=TOKEN)
 dp = Dispatcher()
+
+def filter(message: Message):
+    c=True # включение выключение фильтра
+    return (message.from_user.id in userid) or not c
 
 import BD  # подключение базы данных
 from Bot.StartHelp import *  # ответы на комманды start и help

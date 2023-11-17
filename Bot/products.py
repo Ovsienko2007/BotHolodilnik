@@ -69,6 +69,38 @@ async def process_start_command(message: Message):
         await message.answer(
             text='Нет продуктов ❌')
 
+def sroki1(srok):
+    now = datetime.datetime.now()
+
+    d=int(srok[:2])
+    m=int(srok[3:5])
+    y=int(srok[6:])
+    if int(now.strftime('%Y')) < y:
+        return True
+    elif int(now.strftime('%Y')) == y:
+        if int(now.strftime('%m')) < m:
+            return True
+        elif int(now.strftime('%m')) == m:
+            if int(now.strftime('%d')) <= d:
+                return True
+            else:
+                return False
+        else:
+            return False
+    else:
+        return False
+def sroki2(srok):
+
+    d=int(srok[:2])
+    m=int(srok[3:5])
+    y=int(srok[6:])
+    try:
+        date = datetime.datetime(y,m,d)
+        return True
+    except:
+        return False
+
+
 @dp.message(and_f(F.text.regexp(r'.+\d\d\.\d\d\.\d{4}'), filter))
 async def product_new (message: Message):
     # Обработка сообщения
@@ -76,10 +108,21 @@ async def product_new (message: Message):
     srok=re.findall(r'\d\d\.\d\d\.\d{4}',t)
     srok=srok[-1]
     prod = re.sub(r'\d\d\.\d\d\.\d{4}', '', t)
-    # добавление элемента
-    BD.new(prod,srok)
-    await message.answer("Продукт добавлен ✔")
-
+    if sroki2(srok):
+        if sroki1(srok):
+            # добавление элемента
+            BD.new(prod,srok)
+            await message.answer("Продукт добавлен ✔")
+        else:
+            await message.answer("Продукт не добавлен ❌\n\n"
+                                 "<i>Продукт просрочен\n</i>"
+                                 "<i>Проверьте правильно ли введена дата</i>",
+                                 parse_mode='HTML')
+    else:
+        await message.answer("Продукт не добавлен ❌\n\n"
+                             "<i>Дата записана не корректно\n</i>"
+                             "<i>Проверьте правильно ли введена дата</i>",
+                             parse_mode='HTML')
 def prod_er(message: Message):
     return message.text[0]!="/"
 

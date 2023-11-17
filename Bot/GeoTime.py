@@ -75,17 +75,15 @@ async def ti(message: Message):
     # создание переменных флагов
     flag1 = True
     flag2 = True
-
     # запуск цикла времени
     while True:
         now = datetime.datetime.now() # получение текущего времени
-
-        if now.strftime('%H:%M')=="00:00" and flag1:
+        if int(c)==0 and flag1:
             # Перенос просроченных продуктов из одной таблицы в другую
             BD.new_srok(now.strftime('%d.%m.%Y'))
             flag1=False
 
-        elif now.strftime('%H:%M')!="00:00" and not flag1: # обновление флага
+        elif int(now.strftime('%H'))!=0 and not flag1: # обновление флага
             flag1 = True
 
         if BD.products_srock() != [] and int(now.strftime('%H')) >= 9 and int(now.strftime('%H')) <= 21 and flag2\

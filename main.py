@@ -19,7 +19,6 @@ c = open('userid.txt', 'r')
 userid = []
 for i in c.readlines():
     userid.append(int(i))
-print(userid)
 userid1 = userid[0]  # основной чат
 c.close()
 bot = Bot(token=TOKEN)

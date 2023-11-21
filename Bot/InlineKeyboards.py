@@ -1,3 +1,4 @@
+import BD
 from main import *
 from Bot.products import *
 
@@ -58,6 +59,52 @@ async def DaNet2(callback: CallbackQuery):
     else:
         await callback.message.edit_text(
             text='Продуктов нет ❌')
+    await callback.answer()
+
+
+@dp.callback_query(F.data.in_(['_YES_','_NO_']))
+async def DaNet3(callback: CallbackQuery):
+    if callback.data=='_YES_':
+        print(callback.from_user.id)
+        id=-BD.del_prod_id(callback.from_user.id)
+        BD.del_prod_srok_2(id)
+    else:
+        pass
+    in_keyboard = InlineKeyboardMarkup(
+        inline_keyboard=pr2()
+    )
+    if BD.products()!=[]:
+        await callback.message.edit_text(
+            text='Выбери продукт у которого была вскрыта упаковка 🔪',
+            reply_markup=in_keyboard)
+    else:
+        await callback.message.edit_text(
+            text='Продуктов c упаковкой нет ❌')
+    await callback.answer()
+
+
+def index(callback: CallbackQuery):
+    return callback.data[0]=='-'
+@dp.callback_query(index)
+async def process_buttons_press(callback: CallbackQuery):
+    BD.del_prod_id_update(callback.from_user.id,callback.data)
+
+    button_1 = InlineKeyboardButton(
+        text='✔ Да',
+        callback_data='_YES_')
+    button_2 = InlineKeyboardButton(
+        text='❌ Нет',
+        callback_data='_NO_')
+    danet2 = InlineKeyboardMarkup(
+        inline_keyboard=[[button_1],
+                         [button_2]]
+    )
+
+    await callback.message.edit_text(
+        text=f'Вы действительно вскрыли упаковку <b>{BD.prod(-int(callback.data))[0][1]}</b>',
+        reply_markup=danet2,
+        parse_mode='HTML'
+    )
     await callback.answer()
 
 # удаление продукта 1 этап

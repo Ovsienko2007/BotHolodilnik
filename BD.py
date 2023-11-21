@@ -5,11 +5,13 @@ conn = sqlite3.connect('BD.db')
 cur = conn.cursor()
 #cur.execute("ВАШ-SQL-ЗАПРОС-ЗДЕСЬ;")
 cur.execute("""CREATE TABLE IF NOT EXISTS Products(
-    product_id   INTEGER NOT NULL,
-    product_name TEXT,
-    product_srok TEXT,
+    product_id    INTEGER NOT NULL,
+    product_name  TEXT,
+    product_srok  TEXT,
+    product_srok2 INTEGER DEFAULT 1,
+    Upakovka      TEXT    DEFAULT 1,
     PRIMARY KEY (product_id)
-    );
+);
 """)
 cur.execute("""CREATE TABLE IF NOT EXISTS Product_srok(
     product_id   INTEGER NOT NULL,
@@ -17,6 +19,11 @@ cur.execute("""CREATE TABLE IF NOT EXISTS Product_srok(
     product_srok TEXT,
     PRIMARY KEY (product_id)
     );
+""")
+cur.execute("""CREATE TABLE IF NOT EXISTS Product_srok2 (
+    product_name string UNIQUE,
+    product_srok TEXT DEFAULT 1
+);
 """)
 cur.execute("""CREATE TABLE IF NOT EXISTS Users (
     user_id INTEGER UNIQUE,
@@ -29,13 +36,81 @@ cur.execute("""CREATE TABLE IF NOT EXISTS Users (
 conn.commit()
 conn.close()
 
+# Вывод продуктов
+def products():
+    # Устанавливаем соединение с базой данных
+    connection = sqlite3.connect('BD.db')
+    cursor = connection.cursor()
+    # Выбираем всех пользователей
+    cursor.execute('SELECT * FROM Products')
+    pr = cursor.fetchall()
+    # Закрываем соединение
+    connection.close()
+    return pr
+
+def new_prod_srok_2(prod,srok):
+    prod = prod.lower()
+    connection = sqlite3.connect('BD.db')
+    cursor = connection.cursor()
+    # Добавляем нового продукта
+    try:
+        cursor.execute('INSERT INTO Product_srok2 (product_name, product_srok) VALUES (?, ?)', (prod,srok))
+    except:
+        cursor.execute('UPDATE Product_srok2 SET product_srok= ? WHERE product_name = ?', (srok, prod))
+    # Сохраняем изменения и закрываем соединение
+    connection.commit()
+    connection.close()
+
+def update_prod_srok_2():
+    connection = sqlite3.connect('BD.db')
+    cursor = connection.cursor()
+    for i in products():
+        if i[4]=='0':
+            cursor.execute('UPDATE Products SET product_srok2= ? WHERE product_id = ?', (i[3]-1,i[0]))
+    connection.commit()
+    connection.close()
+
+def del_prod_srok_2(a):
+    # Устанавливаем соединение с базой данных
+    connection = sqlite3.connect('BD.db')
+    cursor = connection.cursor()
+    # Меняем значение
+    cursor.execute('UPDATE Products SET Upakovka = 0 WHERE product_id = ?', (a,))
+    # Сохраняем изменения и закрываем соединение
+    connection.commit()
+    connection.close()
+def prod_srok_2(a):
+    a=a.lower()
+    # Устанавливаем соединение с базой данных
+    connection = sqlite3.connect('BD.db')
+    cursor = connection.cursor()
+    # Выбираем продукт
+    cursor.execute('SELECT * FROM Product_srok2 WHERE product_name = ?', (a,))
+    t = cursor.fetchall()
+    # Закрываем соединение
+    connection.close()
+    if t!=[]:
+        return t[0][1]
+    else:
+        return 1
+
 # Добавление элементов
-def new(prod,srok):
+def new(prod,srok,*args):
     # Устанавливаем соединение с базой данных
     connection = sqlite3.connect('BD.db')
     cursor = connection.cursor()
     # Добавляем новый продукт
-    cursor.execute('INSERT INTO Products (product_name, product_srok) VALUES (?, ?)', (prod, srok))
+    if args!=():
+        cursor.execute('INSERT INTO Products (product_name, product_srok, product_srok2) VALUES (?, ?, ?)', (prod, srok))
+
+    else:
+        sr=0
+        for i in prod.split():
+            if prod_srok_2(i)!=1:
+                sr=prod_srok_2(i)
+                break
+        cursor.execute('INSERT INTO Products (product_name, product_srok, product_srok2) VALUES (?, ?, ?)', (prod, srok, sr))
+
     # Сохраняем изменения и закрываем соединение
     connection.commit()
     connection.close()
@@ -52,18 +127,6 @@ def delite(a):
     # Сохраняем изменения и закрываем соединение
     connection.commit()
     connection.close()
-
-# Вывод продуктов
-def products():
-    # Устанавливаем соединение с базой данных
-    connection = sqlite3.connect('BD.db')
-    cursor = connection.cursor()
-    # Выбираем всех пользователей
-    cursor.execute('SELECT * FROM Products')
-    pr = cursor.fetchall()
-    # Закрываем соединение
-    connection.close()
-    return pr
 
 # Выбор продукта по id
 def prod(a):
@@ -85,6 +148,8 @@ def new_srok(a):
     # Выбираем продукт
     cursor.execute('SELECT * FROM Products WHERE product_srok = ?', (a,))
     pr = cursor.fetchall()
+    cursor.execute('SELECT * FROM Products WHERE  product_srok2=0')
+    pr+=cursor.fetchall()
     for i in pr:
         delite(i[0])
     # Закрываем соединение
@@ -184,6 +249,8 @@ def del_prod_id(a):
     connection.close()
     return pr[0][0]
 
+
 if __name__ == "__main__":
+    del_prod_srok_2(1)
     for i in products():
-        print(f'{i[0]}  {i[1]}: {i[2]};')
+        print(f'{i[0]}  {i[1]}: {i[2]} | {i[3]};')

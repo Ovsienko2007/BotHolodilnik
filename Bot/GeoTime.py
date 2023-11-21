@@ -1,3 +1,4 @@
+import BD
 from main import *
 
 # получение геопозиции
@@ -45,7 +46,7 @@ async def home_com(message: Message):
                              parse_mode='HTML')
 
 # отправка геопозиции "дома" из файла
-@dp.message(and_f(F.text.regexp(r'Дом.+'), filter))
+@dp.message(and_f(F.text.regexp(r'Дом 🏠'), filter))
 async def home1(message: Message):
     ge = home()
     if ge!=[]:
@@ -57,11 +58,11 @@ async def home1(message: Message):
 
 # проверка находится ли пользователь "Дома"
 def geo123(user):
-    us=list(map(float, BD.geo(user)))
+    us=BD.geo(user)
     ho=home()
     if BD.geo(user)==('No', 'No'): # Если данные о геопозиции не были переданы
         return True
-    elif ho[0]-0.0002<us[0]<ho[0]+0.0002 and ho[1]-0.0002<us[1]<ho[1]+0.0002: # Если пользователь находится дома
+    elif ho[0]-0.0002<float(us[0])<ho[0]+0.0002 and ho[1]-0.0002<float(us[1])<ho[1]+0.0002: # Если пользователь находится дома
         return True
     else:  # Если пользователь не находится дома
         return False
@@ -77,14 +78,12 @@ async def ti(message: Message):
     flag2 = True
     # запуск цикла времени
     while True:
-        now = datetime.datetime.now() # получение текущего времени
-        if int(now.strftime('%H'))==0 and flag1:
-            # Перенос просроченных продуктов из одной таблицы в другую
-            BD.new_srok(now.strftime('%d.%m.%Y'))
+        # перенос просроченных продуктов из одной таблицы в другую
+        now = datetime.datetime.now()  # получение текущего времени
+        BD.new_srok(str((int(now.strftime('%d'))-1))+'.'+now.strftime('%m.%Y'))
+        if flag1 and int(now.strftime('%H')) != 0 and message.from_user.id==userid[0]:
+            BD.update_prod_srok_2()
             flag1=False
-
-        elif int(now.strftime('%H'))!=0 and not flag1: # обновление флага
-            flag1 = True
 
         if BD.products_srock() != [] and int(now.strftime('%H')) >= 9 and int(now.strftime('%H')) <= 21 and flag2\
                 and geo123(message.from_user.id) :
@@ -92,7 +91,7 @@ async def ti(message: Message):
                                  '<i>Нажмите на кнопку "Просроченные продукты" , чтобы просмотреть их</i>',
                                  parse_mode='HTML')
             flag2=False
-        elif int(now.strftime('%H')) == 0 and not flag2:
+        if int(now.strftime('%H')) == 0:
             flag2=True
 
-        await asyncio.sleep(1)
+        await asyncio.sleep(60)

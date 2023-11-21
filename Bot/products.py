@@ -1,7 +1,7 @@
 from main import *
 
 # удаление просроченных продуктов
-@dp.message(and_f(F.text.regexp(r'Просроченные продукты.+'), filter))
+@dp.message(and_f(F.text.regexp(r'Просроченные продукты 🗑'), filter))
 async def pr_prods(message: Message):
   c = BD.products_srock()
   if c != []:
@@ -33,7 +33,19 @@ def pr():
 
     return products
 
-@dp.message(and_f(F.text.regexp(r'Продукты.+'), filter))
+
+def pr2():
+    products = []
+    for i in BD.products():
+        if i[-1]!="0":
+            button = InlineKeyboardButton(
+            text=f'{i[1]}: {i[2]}',
+            callback_data=str(-i[0]))
+            products.append([button])
+
+    return products
+
+@dp.message(and_f(F.text.regexp(r'Продукты 🍞'), filter))
 async def product(message: Message):
     print(3)
     if BD.products()!=[]:
@@ -55,7 +67,7 @@ async def product(message: Message):
         await message.answer("Продуктов нет ❌")
 
 # удаление продуктов
-@dp.message(and_f(F.text.regexp(r'Удаление продуктов.+'), filter))
+@dp.message(and_f(F.text.regexp(r'Удаление продуктов ❌'), filter))
 async def process_start_command(message: Message):
     # сборка клавиатуры из кнопок
     if pr()!=[]:
@@ -68,6 +80,21 @@ async def process_start_command(message: Message):
     else:
         await message.answer(
             text='Нет продуктов ❌')
+
+
+@dp.message(and_f(F.text.regexp(r'Обновление срока годности 🔄'), filter))
+async def process_start_command(message: Message):
+    # сборка клавиатуры из кнопок
+    if pr()!=[]:
+        in_keyboard = InlineKeyboardMarkup(
+            inline_keyboard=pr2()
+        )
+        await message.answer(
+            text='Выбери продукт у которого была вскрыта упаковка 🔪',
+            reply_markup=in_keyboard)
+    else:
+        await message.answer(
+            text='Продуктов c упаковкой нет ❌')
 
 def sroki1(srok):
     now = datetime.datetime.now()
@@ -100,18 +127,24 @@ def sroki2(srok):
     except:
         return False
 
-
-@dp.message(and_f(F.text.regexp(r'.+\d\d\.\d\d\.\d{4}'), filter))
+@dp.message(and_f(F.text.regexp(r'.+\d\d\.\d\d\.\d{4}\s?\d*'), filter))
 async def product_new (message: Message):
     # Обработка сообщения
     t=message.text
+    a = re.search(r'\d\d\.\d\d\.\d{4}', t)
     srok=re.findall(r'\d\d\.\d\d\.\d{4}',t)
     srok=srok[-1]
-    prod = re.sub(r'\d\d\.\d\d\.\d{4}', '', t)
+
+    prodsr = re.sub(r'\d\d\.\d\d\.\d{4}', '', t)
+    sr=prodsr[a.start()+1:]
+    prod=prodsr[:a.start()-1]
     if sroki2(srok):
         if sroki1(srok):
             # добавление элемента
-            BD.new(prod,srok)
+            if sr!="":
+                BD.new(prod,srok,int(sr))
+            else:
+                BD.new(prod, srok)
             await message.answer("Продукт добавлен ✔")
         else:
             await message.answer("Продукт не добавлен ❌\n\n"
@@ -123,12 +156,24 @@ async def product_new (message: Message):
                              "<i>Дата записана не корректно\n</i>"
                              "<i>Проверьте правильно ли введена дата</i>",
                              parse_mode='HTML')
+@dp.message(and_f(F.text.regexp(r'.+\d+'), filter))
+async def product_new (message: Message):
+    # Обработка сообщения
+    t=message.text
+    print(t)
+    srok=re.findall(r'\d+',t)
+    srok=srok[-1]
+    prod = re.sub(r'\d+', '', t)[:-1]
+    await message.answer("Срок годности для продукта добавлен ✔")
+    BD.new_prod_srok_2(prod,srok)
+
+
 def prod_er(message: Message):
     return message.text[0]!="/"
 
 @dp.message(and_f(~F.text.regexp(r'Дом.+'), ~F.location, prod_er, filter))
 async def prod_er_ans (message: Message):
-    await message.answer("Продукт не добавлен\n\n"
+    await message.answer("Продукт не добавлен ❌\n\n"
                          "Проверьте соответствие образцу\n"
                          "Образец: \n<i>Продукт 23.12.2023</i>",
                          parse_mode='HTML')
